@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="分拣机器人操作与编程智能评价系统">
+    <meta name="keywords" content="机器人，评价系统，分拣，职业教育">
+    <title>分拣机器人操作与编程智能评价系统</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span class="logo-icon">🤖</span>
+                <div class="logo-text">
+                    <h1>分拣机器人智能评价系统</h1>
+                    <p>Robotic Sorting Intelligent Evaluation System</p>
+                </div>
+            </div>
+            <div class="header-controls">
+                <button class="control-btn" id="refreshBtn" title="刷新数据">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M23 4v6h-6M1 20v-6h6"/>
+                        <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+                    </svg>
+                </button>
+                <button class="control-btn" id="exportBtn" title="导出报告">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                    </svg>
+                </button>
+                <button class="control-btn" id="fullscreenBtn" title="全屏显示">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- 统计卡片 -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #00d4ff, #0099ff);">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <h3>班级总人数</h3>
+                    <div class="value" id="totalStudents">30</div>
+                    <div class="label">6 个学习小组</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #00ff88, #00cc6a);">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <path d="M12 2v20M2 12h20"/>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <h3>班级平均分</h3>
+                    <div class="value" id="avgScore">82.5</div>
+                    <div class="label" id="avgLevel">良好水平</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #ffaa00, #ff8800);">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <h3>优秀率</h3>
+                    <div class="value" id="excellentRate">45%</div>
+                    <div class="label">>90 分占比</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #0099ff, #0077cc);">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+                        <path d="M22 4L12 14.01l-3-3"/>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <h3>达标率</h3>
+                    <div class="value" id="passRate">92%</div>
+                    <div class="label">>70 分占比</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 图表区域 -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>各组综合得分对比</h3>
+                    <span class="chart-badge">实时更新</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="groupBarChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>能力维度分析</h3>
+                    <span class="chart-badge">雷达图</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>评价构成比例</h3>
+                    <span class="chart-badge">环形图</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="doughnutChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card full-width">
+                <div class="chart-header">
+                    <h3>过程评价明细（60%）</h3>
+                    <span class="chart-badge">堆叠条形图</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="processBarChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card full-width">
+                <div class="chart-header">
+                    <h3>各组成绩变化趋势</h3>
+                    <span class="chart-badge">6 周追踪</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="trendLineChart"></canvas>
+                </div>
+                <div class="legend" id="trendLegend"></div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>评价主体权重</h3>
+                    <span class="chart-badge">多元化评价</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="evaluatorChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>技能点掌握情况</h3>
+                    <span class="chart-badge">6 项核心技能</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="skillChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>职业素养评价</h3>
+                    <span class="chart-badge">五维素养</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="qualityRadarChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 详细数据表格 -->
+        <div class="table-section">
+            <div class="section-header">
+                <h3>📊 各组详细评价数据</h3>
+                <div class="table-controls">
+                    <button class="table-btn" onclick="sortTable('score')">按分数排序</button>
+                    <button class="table-btn" onclick="sortTable('group')">按组别排序</button>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table id="scoreTable">
+                    <thead>
+                        <tr>
+                            <th>组别</th>
+                            <th>成员</th>
+                            <th data-sort="pre">课前 (10%)</th>
+                            <th data-sort="during">课中 (40%)</th>
+                            <th data-sort="post">课后 (10%)</th>
+                            <th data-sort="knowledge">知识考核 (10%)</th>
+                            <th data-sort="skill">技能考核 (10%)</th>
+                            <th data-sort="quality">素养考核 (10%)</th>
+                            <th data-sort="certificate">证书/大赛 (10%)</th>
+                            <th data-sort="total">综合得分</th>
+                            <th>等级</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scoreTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 小组成员名单 -->
+        <div class="table-section">
+            <div class="section-header">
+                <h3>👥 小组成员名单</h3>
+            </div>
+            <div class="member-grid" id="memberGrid"></div>
+        </div>
+
+        <!-- 评价标准说明 -->
+        <div class="table-section">
+            <div class="section-header">
+                <h3>📋 评价标准说明</h3>
+            </div>
+            <div class="table-wrapper">
+                <table class="standard-table">
+                    <thead>
+                        <tr>
+                            <th>评价环节</th>
+                            <th>权重</th>
+                            <th>评价要素</th>
+                            <th>达标标准</th>
+                            <th>优秀标准</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>过程评价 - 课前</td>
+                            <td>10%</td>
+                            <td>线上预练、出勤</td>
+                            <td>>7 分</td>
+                            <td>>9 分</td>
+                        </tr>
+                        <tr>
+                            <td>过程评价 - 课中</td>
+                            <td>40%</td>
+                            <td>工艺流程、装夹爪、程序编写</td>
+                            <td>>28 分</td>
+                            <td>>36 分</td>
+                        </tr>
+                        <tr>
+                            <td>过程评价 - 课后</td>
+                            <td>10%</td>
+                            <td>真机真练、案例编程</td>
+                            <td>>7 分</td>
+                            <td>>9 分</td>
+                        </tr>
+                        <tr>
+                            <td>结果评价 - 知识/技能/素养</td>
+                            <td>30%</td>
+                            <td>岗位考核、1+X 证书、技能大赛</td>
+                            <td>>21 分</td>
+                            <td>>28 分</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <footer>
+            <div class="footer-content">
+                <p>分拣机器人操作与编程智能评价系统 © 2024</p>
+                <p>技术支持：学习通虚拟仿真软件 | 工业机器人系统操作员 1+X 技能点</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 加载动画 -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>正在加载数据...</p>
+    </div>
+
+    <!-- 导出提示 -->
+    <div class="toast" id="toast"></div>
+
+    <script src="js/data.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

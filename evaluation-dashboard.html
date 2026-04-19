@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分拣机器人操作与编程智能评价系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #0a1628 0%, #1a3a5c 50%, #0d2137 100%);
+            min-height: 100vh;
+            color: #e0f0ff;
+        }
+
+        .container {
+            max-width: 1920px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            background: linear-gradient(90deg, transparent, rgba(0, 100, 200, 0.3), transparent);
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, #00d4ff, #0099ff, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 150, 255, 0.5);
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #8ab;
+            font-size: 1.1rem;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(0, 80, 150, 0.4), rgba(0, 40, 80, 0.6));
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            border: 1px solid rgba(0, 150, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 100, 200, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .stat-card h3 {
+            color: #8ab;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-card .label {
+            color: #678;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .chart-card {
+            background: linear-gradient(135deg, rgba(0, 60, 120, 0.4), rgba(0, 30, 60, 0.6));
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(0, 150, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 80, 150, 0.2);
+        }
+
+        .chart-card.full-width {
+            grid-column: span 3;
+        }
+
+        .chart-card h3 {
+            color: #00d4ff;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-card h3::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(180deg, #00d4ff, #0099ff);
+            border-radius: 2px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .chart-card.full-width .chart-container {
+            height: 400px;
+        }
+
+        .table-section {
+            background: linear-gradient(135deg, rgba(0, 60, 120, 0.4), rgba(0, 30, 60, 0.6));
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(0, 150, 255, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .table-section h3 {
+            color: #00d4ff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(0, 150, 255, 0.2);
+        }
+
+        th {
+            background: rgba(0, 100, 200, 0.3);
+            color: #00d4ff;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: rgba(0, 100, 200, 0.2);
+        }
+
+        .score-excellent { color: #00ff88; }
+        .score-good { color: #00d4ff; }
+        .score-average { color: #ffaa00; }
+        .score-poor { color: #ff6666; }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 50, 100, 0.5);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #567;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 1200px) {
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .charts-grid { grid-template-columns: repeat(2, 1fr); }
+            .chart-card.full-width { grid-column: span 2; }
+        }
+
+        @media (max-width: 768px) {
+            .stats-row { grid-template-columns: 1fr; }
+            .charts-grid { grid-template-columns: 1fr; }
+            .chart-card.full-width { grid-column: span 1; }
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #8ab;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 4px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 分拣机器人操作与编程智能评价系统</h1>
+            <p>理论实践一体化 · 过程与结果并重 · 多维度综合评价</p>
+        </header>
+
+        <!-- 统计卡片 -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <h3>班级总人数</h3>
+                <div class="value" id="totalStudents">30</div>
+                <div class="label">6 个学习小组</div>
+            </div>
+            <div class="stat-card">
+                <h3>班级平均分</h3>
+                <div class="value" id="avgScore">82.5</div>
+                <div class="label">良好水平</div>
+            </div>
+            <div class="stat-card">
+                <h3>优秀率</h3>
+                <div class="value" id="excellentRate">45%</div>
+                <div class="label">>90 分占比</div>
+            </div>
+            <div class="stat-card">
+                <h3>达标率</h3>
+                <div class="value" id="passRate">92%</div>
+                <div class="label">>70 分占比</div>
+            </div>
+        </div>
+
+        <!-- 图表区域 -->
+        <div class="charts-grid">
+            <!-- 各组综合得分对比柱状图 -->
+            <div class="chart-card">
+                <h3>各组综合得分对比</h3>
+                <div class="chart-container">
+                    <canvas id="groupBarChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 能力维度雷达图 -->
+            <div class="chart-card">
+                <h3>能力维度分析</h3>
+                <div class="chart-container">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 评价类型分布环形图 -->
+            <div class="chart-card">
+                <h3>评价构成比例</h3>
+                <div class="chart-container">
+                    <canvas id="doughnutChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 过程评价明细横向条形图 -->
+            <div class="chart-card full-width">
+                <h3>过程评价明细（60%）</h3>
+                <div class="chart-container">
+                    <canvas id="processBarChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 成绩趋势折线图 -->
+            <div class="chart-card full-width">
+                <h3>各组成绩变化趋势</h3>
+                <div class="chart-container">
+                    <canvas id="trendLineChart"></canvas>
+                </div>
+                <div class="legend">
+                    <div class="legend-item"><div class="legend-color" style="background:#00d4ff"></div>组 1</div>
+                    <div class="legend-item"><div class="legend-color" style="background:#00ff88"></div>组 2</div>
+                    <div class="legend-item"><div class="legend-color" style="background:#ffaa00"></div>组 3</div>
+                    <div class="legend-item"><div class="legend-color" style="background:#ff66ff"></div>组 4</div>
+                    <div class="legend-item"><div class="legend-color" style="background:#0099ff"></div>组 5</div>
+                    <div class="legend-item"><div class="legend-color" style="background:#ff6666"></div>组 6</div>
+                </div>
+            </div>
+
+            <!-- 评价主体权重图 -->
+            <div class="chart-card">
+                <h3>评价主体权重</h3>
+                <div class="chart-container">
+                    <canvas id="evaluatorChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 技能点掌握情况 -->
+            <div class="chart-card">
+                <h3>技能点掌握情况</h3>
+                <div class="chart-container">
+                    <canvas id="skillChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 素质评价雷达图 -->
+            <div class="chart-card">
+                <h3>职业素养评价</h3>
+                <div class="chart-container">
+                    <canvas id="qualityRadarChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 详细数据表格 -->
+        <div class="table-section">
+            <h3>📊 各组详细评价数据</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>组别</th>
+                        <th>成员</th>
+                        <th>课前 (10%)</th>
+                        <th>课中 (40%)</th>
+                        <th>课后 (10%)</th>
+                        <th>知识考核 (10%)</th>
+                        <th>技能考核 (10%)</th>
+                        <th>素养考核 (10%)</th>
+                        <th>证书/大赛 (10%)</th>
+                        <th>综合得分</th>
+                        <th>等级</th>
+                    </tr>
+                </thead>
+                <tbody id="scoreTable">
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 小组成员名单 -->
+        <div class="table-section">
+            <h3>👥 小组成员名单</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>组别</th>
+                        <th>成员名单</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>组 1</td>
+                        <td>董惠泽、孙朝政、刘硕、刘星宇、轩辕昊宇</td>
+                    </tr>
+                    <tr>
+                        <td>组 2</td>
+                        <td>张宇、吴政洋、张浩宇、周鹏帅、杨欣锐</td>
+                    </tr>
+                    <tr>
+                        <td>组 3</td>
+                        <td>李泽、周光源、于恩泽、谯誉州、尤荣泽</td>
+                    </tr>
+                    <tr>
+                        <td>组 4</td>
+                        <td>杨家琦、娄建雨、许晨昊、王兴凤、牟欣炜</td>
+                    </tr>
+                    <tr>
+                        <td>组 5</td>
+                        <td>王祖昊、侯树桐、孙凯睿、问泽坤、李锦程</td>
+                    </tr>
+                    <tr>
+                        <td>组 6</td>
+                        <td>顾兴洋、刘光月、张晓娇、李鸿涛、牛立昊</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 评价标准说明 -->
+        <div class="table-section">
+            <h3>📋 评价标准说明</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>评价环节</th>
+                        <th>权重</th>
+                        <th>评价要素</th>
+                        <th>达标标准</th>
+                        <th>优秀标准</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>过程评价 - 课前</td>
+                        <td>10%</td>
+                        <td>线上预练、出勤</td>
+                        <td>>7 分</td>
+                        <td>>9 分</td>
+                    </tr>
+                    <tr>
+                        <td>过程评价 - 课中</td>
+                        <td>40%</td>
+                        <td>工艺流程、装夹爪、程序编写</td>
+                        <td>>28 分</td>
+                        <td>>36 分</td>
+                    </tr>
+                    <tr>
+                        <td>过程评价 - 课后</td>
+                        <td>10%</td>
+                        <td>真机真练、案例编程</td>
+                        <td>>7 分</td>
+                        <td>>9 分</td>
+                    </tr>
+                    <tr>
+                        <td>结果评价 - 知识/技能/素养</td>
+                        <td>30%</td>
+                        <td>岗位考核、1+X 证书、技能大赛</td>
+                        <td>>21 分</td>
+                        <td>>28 分</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <footer>
+            <p>分拣机器人操作与编程智能评价系统 © 2024 | 学习通虚拟仿真软件支持</p>
+        </footer>
+    </div>
+
+    <script>
+        // 小组数据
+        const groups = [
+            { name: '组 1', members: ['董惠泽', '孙朝政', '刘硕', '刘星宇', '轩辕昊宇'] },
+            { name: '组 2', members: ['张宇', '吴政洋', '张浩宇', '周鹏帅', '杨欣锐'] },
+            { name: '组 3', members: ['李泽', '周光源', '于恩泽', '谯誉州', '尤荣泽'] },
+            { name: '组 4', members: ['杨家琦', '娄建雨', '许晨昊', '王兴凤', '牟欣炜'] },
+            { name: '组 5', members: ['王祖昊', '侯树桐', '孙凯睿', '问泽坤', '李锦程'] },
+            { name: '组 6', members: ['顾兴洋', '刘光月', '张晓娇', '李鸿涛', '牛立昊'] }
+        ];
+
+        // 模拟评价数据
+        const groupData = [
+            { name: '组 1', pre: 8.5, during: 35, post: 8.5, knowledge: 9, skill: 8.5, quality: 9, certificate: 8.5, total: 87 },
+            { name: '组 2', pre: 9, during: 37, post: 9, knowledge: 9.5, skill: 9, quality: 9.5, certificate: 9, total: 92 },
+            { name: '组 3', pre: 7.5, during: 30, post: 7.5, knowledge: 8, skill: 7.5, quality: 8, certificate: 7.5, total: 76 },
+            { name: '组 4', pre: 8, during: 33, post: 8, knowledge: 8.5, skill: 8, quality: 8.5, certificate: 8, total: 82 },
+            { name: '组 5', pre: 9.5, during: 38, post: 9.5, knowledge: 10, skill: 9.5, quality: 10, certificate: 9.5, total: 96 },
+            { name: '组 6', pre: 7, during: 28, post: 7, knowledge: 7.5, skill: 7, quality: 7.5, certificate: 7, total: 71 }
+        ];
+
+        // 能力维度数据（用于雷达图）
+        const capabilityData = {
+            labels: ['理论知识', '工艺规划', '程序编写', '装夹操作', '团队协作', '职业素养'],
+            group1: [85, 88, 82, 85, 90, 88],
+            group2: [90, 92, 88, 90, 88, 92],
+            group3: [75, 78, 72, 75, 80, 78],
+            group4: [80, 82, 78, 80, 85, 82],
+            group5: [95, 96, 92, 94, 98, 96],
+            group6: [70, 72, 68, 70, 75, 72]
+        };
+
+        // Chart.js 全局配置
+        Chart.defaults.color = '#8ab';
+        Chart.defaults.borderColor = 'rgba(0, 150, 255, 0.2)';
+
+        // 1. 各组综合得分对比柱状图
+        new Chart(document.getElementById('groupBarChart'), {
+            type: 'bar',
+            data: {
+                labels: groupData.map(g => g.name),
+                datasets: [{
+                    label: '综合得分',
+                    data: groupData.map(g => g.total),
+                    backgroundColor: [
+                        'rgba(0, 212, 255, 0.8)',
+                        'rgba(0, 255, 136, 0.8)',
+                        'rgba(255, 170, 0, 0.8)',
+                        'rgba(255, 102, 255, 0.8)',
+                        'rgba(0, 153, 255, 0.8)',
+                        'rgba(255, 102, 102, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(0, 212, 255, 1)',
+                        'rgba(0, 255, 136, 1)',
+                        'rgba(255, 170, 0, 1)',
+                        'rgba(255, 102, 255, 1)',
+                        'rgba(0, 153, 255, 1)',
+                        'rgba(255, 102, 102, 1)'
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 60,
+                        max: 100
+                    }
+                }
+            }
+        });
+
+        // 2. 能力维度雷达图
+        new Chart(document.getElementById('radarChart'), {
+            type: 'radar',
+            data: {
+                labels: capabilityData.labels,
+                datasets: [
+                    {
+                        label: '组 1',
+                        data: capabilityData.group1,
+                        borderColor: 'rgba(0, 212, 255, 1)',
+                        backgroundColor: 'rgba(0, 212, 255, 0.2)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: '组 5',
+                        data: capabilityData.group5,
+                        borderColor: 'rgba(0, 153, 255, 1)',
+                        backgroundColor: 'rgba(0, 153, 255, 0.2)',
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        min: 50,
+                        max: 100,
+                        grid: { color: 'rgba(0, 150, 255, 0.2)' }
+                    }
+                }
+            }
+        });
+
+        // 3. 评价构成比例环形图
+        new Chart(document.getElementById('doughnutChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['课前', '课中', '课后', '知识考核', '技能考核', '素养考核', '证书/大赛'],
+                datasets: [{
+                    data: [5, 5, 40, 10, 10, 10, 5, 5],
+                    backgroundColor: [
+                        'rgba(0, 212, 255, 0.8)',
+                        'rgba(0, 153, 255, 0.8)',
+                        'rgba(0, 255, 136, 0.8)',
+                        'rgba(255, 170, 0, 0.8)',
+                        'rgba(255, 102, 255, 0.8)',
+                        'rgba(255, 102, 102, 0.8)',
+                        'rgba(153, 102, 255, 0.8)'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 10, font: { size: 10 } }
+                    }
+                }
+            }
+        });
+
+        // 4. 过程评价明细横向条形图
+        new Chart(document.getElementById('processBarChart'), {
+            type: 'bar',
+            data: {
+                labels: groupData.map(g => g.name),
+                datasets: [
+                    {
+                        label: '课前 (10%)',
+                        data: groupData.map(g => g.pre),
+                        backgroundColor: 'rgba(0, 212, 255, 0.8)',
+                        borderRadius: 5
+                    },
+                    {
+                        label: '课中 (40%)',
+                        data: groupData.map(g => g.during),
+                        backgroundColor: 'rgba(0, 255, 136, 0.8)',
+                        borderRadius: 5
+                    },
+                    {
+                        label: '课后 (10%)',
+                        data: groupData.map(g => g.post),
+                        backgroundColor: 'rgba(255, 170, 0, 0.8)',
+                        borderRadius: 5
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                scales: {
+                    x: { stacked: true, max: 60 },
+                    y: { stacked: true }
+                }
+            }
+        });
+
+        // 5. 成绩趋势折线图
+        new Chart(document.getElementById('trendLineChart'), {
+            type: 'line',
+            data: {
+                labels: ['第 1 周', '第 2 周', '第 3 周', '第 4 周', '第 5 周', '第 6 周'],
+                datasets: [
+                    { label: '组 1', data: [78, 80, 83, 85, 86, 87], borderColor: 'rgba(0, 212, 255, 1)', tension: 0.4 },
+                    { label: '组 2', data: [85, 87, 88, 90, 91, 92], borderColor: 'rgba(0, 255, 136, 1)', tension: 0.4 },
+                    { label: '组 3', data: [68, 70, 72, 74, 75, 76], borderColor: 'rgba(255, 170, 0, 1)', tension: 0.4 },
+                    { label: '组 4', data: [75, 77, 79, 80, 81, 82], borderColor: 'rgba(255, 102, 255, 1)', tension: 0.4 },
+                    { label: '组 5', data: [88, 90, 92, 93, 95, 96], borderColor: 'rgba(0, 153, 255, 1)', tension: 0.4 },
+                    { label: '组 6', data: [62, 65, 67, 68, 70, 71], borderColor: 'rgba(255, 102, 102, 1)', tension: 0.4 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { min: 50, max: 100 }
+                }
+            }
+        });
+
+        // 6. 评价主体权重图
+        new Chart(document.getElementById('evaluatorChart'), {
+            type: 'pie',
+            data: {
+                labels: ['教师评价', '企业导师', '学生自评', '学生互评'],
+                datasets: [{
+                    data: [40, 30, 15, 15],
+                    backgroundColor: [
+                        'rgba(0, 212, 255, 0.8)',
+                        'rgba(0, 255, 136, 0.8)',
+                        'rgba(255, 170, 0, 0.8)',
+                        'rgba(255, 102, 255, 0.8)'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { font: { size: 10 } }
+                    }
+                }
+            }
+        });
+
+        // 7. 技能点掌握情况
+        new Chart(document.getElementById('skillChart'), {
+            type: 'bar',
+            data: {
+                labels: ['分拣机分类', '工艺规划', '装夹爪操作', '程序编写', '入库流程', '出库流程'],
+                datasets: [{
+                    label: '平均掌握度',
+                    data: [82, 85, 80, 83, 81, 79],
+                    backgroundColor: 'rgba(0, 212, 255, 0.6)',
+                    borderColor: 'rgba(0, 212, 255, 1)',
+                    borderWidth: 2,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { min: 50, max: 100 }
+                }
+            }
+        });
+
+        // 8. 职业素养评价雷达图
+        new Chart(document.getElementById('qualityRadarChart'), {
+            type: 'radar',
+            data: {
+                labels: ['爱岗敬业', '忠实奉献', '严谨科学', '精益求精', '团队合作'],
+                datasets: [{
+                    label: '班级平均',
+                    data: [85, 82, 88, 84, 86],
+                    borderColor: 'rgba(0, 212, 255, 1)',
+                    backgroundColor: 'rgba(0, 212, 255, 0.3)',
+                    borderWidth: 2
+                }, {
+                    label: '优秀标准',
+                    data: [95, 95, 95, 95, 95],
+                    borderColor: 'rgba(0, 255, 136, 1)',
+                    backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                    borderWidth: 2,
+                    borderDash: [5, 5]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        min: 50,
+                        max: 100,
+                        grid: { color: 'rgba(0, 150, 255, 0.2)' }
+                    }
+                }
+            }
+        });
+
+        // 填充表格数据
+        const tableBody = document.getElementById('scoreTable');
+        groupData.forEach((group, index) => {
+            const grade = group.total >= 90 ? 'excellent' : group.total >= 80 ? 'good' : group.total >= 70 ? 'average' : 'poor';
+            const gradeText = group.total >= 90 ? '优秀' : group.total >= 80 ? '良好' : group.total >= 70 ? '达标' : '待提高';
+            const row = `
+                <tr>
+                    <td><strong>${group.name}</strong></td>
+                    <td>${groups[index].members.join('、')}</td>
+                    <td class="score-${grade}">${group.pre}</td>
+                    <td class="score-${grade}">${group.during}</td>
+                    <td class="score-${grade}">${group.post}</td>
+                    <td class="score-${grade}">${group.knowledge}</td>
+                    <td class="score-${grade}">${group.skill}</td>
+                    <td class="score-${grade}">${group.quality}</td>
+                    <td class="score-${grade}">${group.certificate}</td>
+                    <td><strong class="score-${grade}">${group.total}</strong></td>
+                    <td>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${group.total}%"></div>
+                        </div>
+                        <span class="score-${grade}">${gradeText}</span>
+                    </td>
+                </tr>
+            `;
+            tableBody.innerHTML += row;
+        });
+
+        // 更新统计卡片
+        const avgScore = groupData.reduce((sum, g) => sum + g.total, 0) / groupData.length;
+        const excellentCount = groupData.filter(g => g.total >= 90).length;
+        const passCount = groupData.filter(g => g.total >= 70).length;
+
+        document.getElementById('avgScore').textContent = avgScore.toFixed(1);
+        document.getElementById('excellentRate').textContent = Math.round(excellentCount / groupData.length * 100) + '%';
+        document.getElementById('passRate').textContent = Math.round(passCount / groupData.length * 100) + '%';
+    </script>
+</body>
+</html>
