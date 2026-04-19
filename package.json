@@ -2,16 +2,22 @@
   "name": "robot-evaluation-system",
   "version": "1.0.0",
   "description": "分拣机器人操作与编程智能评价系统",
+  "main": "index.html",
   "scripts": {
-    "dev": "npx http-server -p 8080 -c-1",
-    "start": "npx http-server -p 8080"
+    "dev": "npx http-server -p 8080 -c-1 --open",
+    "start": "npx http-server -p 8080 -c-1",
+    "install-server": "npm install http-server --save"
   },
   "keywords": [
     "robot",
     "evaluation",
     "education",
-    "dashboard"
+    "dashboard",
+    "http-server"
   ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "http-server": "^14.1.1"
+  }
 }
