@@ -4,7 +4,6 @@
   "description": "分拣机器人操作与编程智能评价系统",
   "scripts": {
     "dev": "npx http-server -p 8080 -c-1",
-    "build": "echo 'No build step required for static files'",
     "start": "npx http-server -p 8080"
   },
   "keywords": [
@@ -14,8 +13,5 @@
     "dashboard"
   ],
   "author": "",
-  "license": "MIT",
-  "devDependencies": {
-    "http-server": "^14.1.1"
-  }
+  "license": "MIT"
 }
