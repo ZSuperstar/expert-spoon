@@ -1,5 +1,6 @@
 {
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
+  "buildCommand": "echo 'Building static site...'",
+  "outputDirectory": ".",
+  "devCommand": "echo 'Dev mode'",
+  "installCommand": "echo 'Skipping install'"
 }
