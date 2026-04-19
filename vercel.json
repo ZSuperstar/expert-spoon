@@ -2,5 +2,21 @@
   "buildCommand": "echo 'Building static site...'",
   "outputDirectory": ".",
   "devCommand": "echo 'Dev mode'",
-  "installCommand": "echo 'Skipping install'"
+  "installCommand": "echo 'Skipping install'",
+  "functions": {
+    "server.js": {
+      "excludeFiles": true
+    }
+  },
+  "routes": [
+    {
+      "src": "^/api/(.*)",
+      "status": 404,
+      "dest": "/404.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ]
 }
