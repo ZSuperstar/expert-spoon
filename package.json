@@ -2,22 +2,26 @@
   "name": "robot-evaluation-system",
   "version": "1.0.0",
   "description": "分拣机器人操作与编程智能评价系统",
-  "main": "index.html",
+  "main": "server.js",
+  "type": "module",
   "scripts": {
-    "dev": "npx http-server -p 8080 -c-1 --open",
-    "start": "npx http-server -p 8080 -c-1",
-    "install-server": "npm install http-server --save"
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "build": "echo 'Static project - no build required'"
   },
   "keywords": [
     "robot",
     "evaluation",
     "education",
     "dashboard",
-    "http-server"
+    "express"
   ],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "http-server": "^14.1.1"
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

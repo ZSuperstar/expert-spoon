@@ -1,12 +1,35 @@
 /**
- * 分拣机器人智能评价系统 - 图表配置
+ * 分拣机器人智能评价系统 - 图表配置 (现代鲜艳配色)
  * 使用 Chart.js 创建各种可视化图表
  */
 
-// Chart.js 全局配置
-Chart.defaults.color = '#8ab';
-Chart.defaults.borderColor = 'rgba(0, 150, 255, 0.2)';
-Chart.defaults.font.family = "'Microsoft YaHei', 'PingFang SC', sans-serif";
+// Chart.js 全局配置 - 现代主题
+Chart.defaults.color = 'rgba(255, 255, 255, 0.7)';
+Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
+Chart.defaults.font.family = "'Inter', -apple-system, BlinkMacSystemFont, sans-serif";
+
+// 鲜艳渐变配色方案
+const MODERN_COLORS = {
+    // 主色调
+    primary: '#667EEA',
+    secondary: '#764BA2',
+
+    // 组别颜色 - 鲜艳渐变
+    groups: [
+        { bg: 'rgba(102, 126, 234, 0.8)', border: '#667EEA' },     // 组 1 - 紫蓝
+        { bg: 'rgba(240, 147, 251, 0.8)', border: '#F093FB' },     // 组 2 - 粉红
+        { bg: 'rgba(245, 87, 108, 0.8)', border: '#F5576C' },      // 组 3 - 珊瑚红
+        { bg: 'rgba(79, 172, 254, 0.8)', border: '#4facfe' },      // 组 4 - 天蓝
+        { bg: 'rgba(67, 233, 123, 0.8)', border: '#43e97b' },      // 组 5 - 薄荷绿
+        { bg: 'rgba(250, 112, 154, 0.8)', border: '#fa709a' }      // 组 6 - 樱花粉
+    ],
+
+    // 状态颜色
+    success: '#00ff88',
+    warning: '#ffaa00',
+    danger: '#ff6b6b',
+    info: '#4facfe'
+};
 
 // 图表实例存储
 const charts = {};
@@ -16,7 +39,12 @@ const charts = {};
  */
 function createGroupBarChart() {
     const ctx = document.getElementById('groupBarChart').getContext('2d');
-    const { evaluationData, colors, getGrade } = window.EVALUATION_DATA;
+    const { evaluationData, getGrade } = window.EVALUATION_DATA;
+
+    // 创建渐变
+    const gradient1 = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient1.addColorStop(0, 'rgba(102, 126, 234, 0.9)');
+    gradient1.addColorStop(1, 'rgba(118, 75, 162, 0.7)');
 
     charts.groupBar = new Chart(ctx, {
         type: 'bar',
@@ -25,17 +53,12 @@ function createGroupBarChart() {
             datasets: [{
                 label: '综合得分',
                 data: evaluationData.map(g => g.total),
-                backgroundColor: [
-                    colors.fill1, colors.fill2, colors.fill3,
-                    colors.fill4, colors.fill5, colors.fill6
-                ],
-                borderColor: [
-                    colors.group1, colors.group2, colors.group3,
-                    colors.group4, colors.group5, colors.group6
-                ],
-                borderWidth: 2,
-                borderRadius: 10,
-                barPercentage: 0.6
+                backgroundColor: MODERN_COLORS.groups.map(g => g.bg),
+                borderColor: MODERN_COLORS.groups.map(g => g.border),
+                borderWidth: 3,
+                borderRadius: 12,
+                barPercentage: 0.7,
+                categoryPercentage: 0.8
             }]
         },
         options: {
@@ -44,13 +67,15 @@ function createGroupBarChart() {
             plugins: {
                 legend: { display: false },
                 tooltip: {
-                    backgroundColor: 'rgba(0, 20, 40, 0.9)',
-                    titleColor: '#00d4ff',
-                    bodyColor: '#e0f0ff',
-                    borderColor: 'rgba(0, 150, 255, 0.3)',
+                    backgroundColor: 'rgba(15, 15, 35, 0.95)',
+                    backdropFilter: 'blur(10px)',
+                    titleColor: '#fff',
+                    bodyColor: 'rgba(255, 255, 255, 0.9)',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
                     borderWidth: 1,
-                    padding: 12,
+                    padding: 14,
                     displayColors: true,
+                    cornerRadius: 12,
                     callbacks: {
                         label: function(context) {
                             const grade = getGrade(context.parsed.y);
@@ -64,11 +89,15 @@ function createGroupBarChart() {
                     beginAtZero: false,
                     min: 50,
                     max: 100,
-                    grid: { color: 'rgba(0, 150, 255, 0.1)' },
-                    ticks: { callback: value => value + '分' }
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                    ticks: {
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        callback: value => value + '分'
+                    }
                 },
                 x: {
-                    grid: { display: false }
+                    grid: { display: false },
+                    ticks: { color: 'rgba(255, 255, 255, 0.7)' }
                 }
             },
             animation: {
@@ -84,7 +113,7 @@ function createGroupBarChart() {
  */
 function createRadarChart() {
     const ctx = document.getElementById('radarChart').getContext('2d');
-    const { capabilityData, colors } = window.EVALUATION_DATA;
+    const { capabilityData } = window.EVALUATION_DATA;
 
     charts.radar = new Chart(ctx, {
         type: 'radar',
@@ -94,20 +123,26 @@ function createRadarChart() {
                 {
                     label: '组 1',
                     data: capabilityData.data[1],
-                    borderColor: colors.group1,
-                    backgroundColor: colors.fill1,
-                    borderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
+                    borderColor: MODERN_COLORS.groups[0].border,
+                    backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                    borderWidth: 3,
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: MODERN_COLORS.groups[0].border,
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
                 },
                 {
                     label: '组 5',
                     data: capabilityData.data[5],
-                    borderColor: colors.group5,
-                    backgroundColor: colors.fill5,
-                    borderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
+                    borderColor: MODERN_COLORS.groups[4].border,
+                    backgroundColor: 'rgba(67, 233, 123, 0.2)',
+                    borderWidth: 3,
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: MODERN_COLORS.groups[4].border,
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
                 }
             ]
         },
@@ -120,7 +155,8 @@ function createRadarChart() {
                     labels: {
                         padding: 15,
                         usePointStyle: true,
-                        pointStyle: 'circle'
+                        pointStyle: 'circle',
+                        color: 'rgba(255, 255, 255, 0.7)'
                     }
                 }
             },
@@ -128,15 +164,13 @@ function createRadarChart() {
                 r: {
                     min: 50,
                     max: 100,
-                    grid: {
-                        color: 'rgba(0, 150, 255, 0.2)'
-                    },
-                    angleLines: {
-                        color: 'rgba(0, 150, 255, 0.2)'
-                    },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                    pointLabels: { color: 'rgba(255, 255, 255, 0.7)' },
                     ticks: {
                         stepSize: 25,
-                        showLabelBackdrop: false
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        backdropColor: 'transparent'
                     }
                 }
             },
@@ -161,21 +195,18 @@ function createDoughnutChart() {
             datasets: [{
                 data: [5, 5, 40, 10, 10, 10, 5, 5],
                 backgroundColor: [
-                    'rgba(0, 212, 255, 0.8)',
-                    'rgba(0, 153, 255, 0.8)',
-                    'rgba(0, 255, 136, 0.8)',
-                    'rgba(255, 170, 0, 0.8)',
-                    'rgba(255, 102, 255, 0.8)',
-                    'rgba(255, 102, 102, 0.8)',
-                    'rgba(153, 102, 255, 0.8)'
+                    '#667EEA', '#764BA2', '#F093FB',
+                    '#F5576C', '#4facfe', '#00f2fe',
+                    '#43e97b'
                 ],
                 borderWidth: 0,
-                hoverOffset: 10
+                hoverOffset: 15
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            cutout: '65%',
             plugins: {
                 legend: {
                     position: 'bottom',
@@ -183,23 +214,26 @@ function createDoughnutChart() {
                         padding: 12,
                         font: { size: 10 },
                         usePointStyle: true,
-                        pointStyle: 'circle'
+                        pointStyle: 'circle',
+                        color: 'rgba(255, 255, 255, 0.7)'
                     }
                 },
                 tooltip: {
-                    backgroundColor: 'rgba(0, 20, 40, 0.9)',
-                    titleColor: '#00d4ff',
-                    bodyColor: '#e0f0ff',
-                    borderColor: 'rgba(0, 150, 255, 0.3)',
+                    backgroundColor: 'rgba(15, 15, 35, 0.95)',
+                    backdropFilter: 'blur(10px)',
+                    titleColor: '#fff',
+                    bodyColor: 'rgba(255, 255, 255, 0.9)',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
                     borderWidth: 1,
-                    padding: 12,
+                    padding: 14,
+                    cornerRadius: 12,
                     callbacks: {
                         label: function(context) {
                             const label = context.label || '';
                             const value = context.parsed || 0;
                             const total = context.dataset.data.reduce((a, b) => a + b, 0);
                             const percentage = ((value / total) * 100).toFixed(1);
-                            return `${label}: ${value}% (${percentage}%)`;
+                            return `${label}: ${percentage}%`;
                         }
                     }
                 }
@@ -229,26 +263,29 @@ function createProcessBarChart() {
                 {
                     label: '课前 (10%)',
                     data: evaluationData.map(g => g.pre),
-                    backgroundColor: 'rgba(0, 212, 255, 0.8)',
-                    borderColor: 'rgba(0, 212, 255, 1)',
-                    borderWidth: 1,
-                    borderRadius: 5
+                    backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                    borderColor: '#667EEA',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    barPercentage: 0.7
                 },
                 {
                     label: '课中 (40%)',
                     data: evaluationData.map(g => g.during),
-                    backgroundColor: 'rgba(0, 255, 136, 0.8)',
-                    borderColor: 'rgba(0, 255, 136, 1)',
-                    borderWidth: 1,
-                    borderRadius: 5
+                    backgroundColor: 'rgba(67, 233, 123, 0.8)',
+                    borderColor: '#43e97b',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    barPercentage: 0.7
                 },
                 {
                     label: '课后 (10%)',
                     data: evaluationData.map(g => g.post),
-                    backgroundColor: 'rgba(255, 170, 0, 0.8)',
-                    borderColor: 'rgba(255, 170, 0, 1)',
-                    borderWidth: 1,
-                    borderRadius: 5
+                    backgroundColor: 'rgba(250, 112, 154, 0.8)',
+                    borderColor: '#fa709a',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    barPercentage: 0.7
                 }
             ]
         },
@@ -261,28 +298,36 @@ function createProcessBarChart() {
                     position: 'top',
                     labels: {
                         padding: 15,
-                        usePointStyle: true
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        color: 'rgba(255, 255, 255, 0.7)'
                     }
                 },
                 tooltip: {
-                    backgroundColor: 'rgba(0, 20, 40, 0.9)',
-                    titleColor: '#00d4ff',
-                    bodyColor: '#e0f0ff',
-                    borderColor: 'rgba(0, 150, 255, 0.3)',
+                    backgroundColor: 'rgba(15, 15, 35, 0.95)',
+                    backdropFilter: 'blur(10px)',
+                    titleColor: '#fff',
+                    bodyColor: 'rgba(255, 255, 255, 0.9)',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
                     borderWidth: 1,
-                    padding: 12
+                    padding: 14,
+                    cornerRadius: 12
                 }
             },
             scales: {
                 x: {
                     stacked: true,
                     max: 60,
-                    grid: { color: 'rgba(0, 150, 255, 0.1)' },
-                    ticks: { callback: value => value + '分' }
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                    ticks: {
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        callback: value => value + '分'
+                    }
                 },
                 y: {
                     stacked: true,
-                    grid: { display: false }
+                    grid: { display: false },
+                    ticks: { color: 'rgba(255, 255, 255, 0.7)' }
                 }
             },
             animation: {
@@ -298,7 +343,7 @@ function createProcessBarChart() {
  */
 function createTrendLineChart() {
     const ctx = document.getElementById('trendLineChart').getContext('2d');
-    const { evaluationData, weekLabels, colors } = window.EVALUATION_DATA;
+    const { evaluationData, weekLabels } = window.EVALUATION_DATA;
 
     charts.trendLine = new Chart(ctx, {
         type: 'line',
@@ -307,25 +352,17 @@ function createTrendLineChart() {
             datasets: evaluationData.map((group, index) => ({
                 label: `组${group.groupId}`,
                 data: group.weeklyScores,
-                borderColor: [
-                    colors.group1, colors.group2, colors.group3,
-                    colors.group4, colors.group5, colors.group6
-                ][index],
-                backgroundColor: [
-                    colors.fill1, colors.fill2, colors.fill3,
-                    colors.fill4, colors.fill5, colors.fill6
-                ][index],
+                borderColor: MODERN_COLORS.groups[index % 6].border,
+                backgroundColor: MODERN_COLORS.groups[index % 6].bg,
                 borderWidth: 3,
                 tension: 0.4,
                 fill: false,
-                pointRadius: 5,
-                pointHoverRadius: 7,
-                pointBackgroundColor: [
-                    colors.group1, colors.group2, colors.group3,
-                    colors.group4, colors.group5, colors.group6
-                ][index],
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2
+                pointRadius: 6,
+                pointHoverRadius: 9,
+                pointBackgroundColor: '#fff',
+                pointBorderColor: MODERN_COLORS.groups[index % 6].border,
+                pointBorderWidth: 3,
+                pointHitRadius: 10
             }))
         },
         options: {
@@ -334,12 +371,14 @@ function createTrendLineChart() {
             plugins: {
                 legend: { display: false },
                 tooltip: {
-                    backgroundColor: 'rgba(0, 20, 40, 0.9)',
-                    titleColor: '#00d4ff',
-                    bodyColor: '#e0f0ff',
-                    borderColor: 'rgba(0, 150, 255, 0.3)',
+                    backgroundColor: 'rgba(15, 15, 35, 0.95)',
+                    backdropFilter: 'blur(10px)',
+                    titleColor: '#fff',
+                    bodyColor: 'rgba(255, 255, 255, 0.9)',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
                     borderWidth: 1,
-                    padding: 12,
+                    padding: 14,
+                    cornerRadius: 12,
                     mode: 'index',
                     intersect: false
                 }
@@ -348,11 +387,15 @@ function createTrendLineChart() {
                 y: {
                     min: 50,
                     max: 100,
-                    grid: { color: 'rgba(0, 150, 255, 0.1)' },
-                    ticks: { callback: value => value + '分' }
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                    ticks: {
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        callback: value => value + '分'
+                    }
                 },
                 x: {
-                    grid: { display: false }
+                    grid: { display: false },
+                    ticks: { color: 'rgba(255, 255, 255, 0.7)' }
                 }
             },
             animation: {
@@ -369,20 +412,19 @@ function createTrendLineChart() {
 // 创建趋势图图例
 function createTrendLegend() {
     const legendContainer = document.getElementById('trendLegend');
-    const { colors } = window.EVALUATION_DATA;
 
     const legendItems = [
-        { name: '组 1', color: colors.group1 },
-        { name: '组 2', color: colors.group2 },
-        { name: '组 3', color: colors.group3 },
-        { name: '组 4', color: colors.group4 },
-        { name: '组 5', color: colors.group5 },
-        { name: '组 6', color: colors.group6 }
+        { name: '组 1', color: MODERN_COLORS.groups[0].border },
+        { name: '组 2', color: MODERN_COLORS.groups[1].border },
+        { name: '组 3', color: MODERN_COLORS.groups[2].border },
+        { name: '组 4', color: MODERN_COLORS.groups[3].border },
+        { name: '组 5', color: MODERN_COLORS.groups[4].border },
+        { name: '组 6', color: MODERN_COLORS.groups[5].border }
     ];
 
     legendContainer.innerHTML = legendItems.map(item => `
         <div class="legend-item">
-            <div class="legend-color" style="background: ${item.color}"></div>
+            <div class="legend-color" style="background: ${item.color}; border-radius: 50%;"></div>
             <span>${item.name}</span>
         </div>
     `).join('');
@@ -402,13 +444,10 @@ function createEvaluatorChart() {
             datasets: [{
                 data: evaluatorWeights.data,
                 backgroundColor: [
-                    'rgba(0, 212, 255, 0.8)',
-                    'rgba(0, 255, 136, 0.8)',
-                    'rgba(255, 170, 0, 0.8)',
-                    'rgba(255, 102, 255, 0.8)'
+                    '#667EEA', '#43e97b', '#fa709a', '#F093FB'
                 ],
                 borderWidth: 0,
-                hoverOffset: 15
+                hoverOffset: 20
             }]
         },
         options: {
@@ -421,16 +460,19 @@ function createEvaluatorChart() {
                         padding: 12,
                         font: { size: 10 },
                         usePointStyle: true,
-                        pointStyle: 'circle'
+                        pointStyle: 'circle',
+                        color: 'rgba(255, 255, 255, 0.7)'
                     }
                 },
                 tooltip: {
-                    backgroundColor: 'rgba(0, 20, 40, 0.9)',
-                    titleColor: '#00d4ff',
-                    bodyColor: '#e0f0ff',
-                    borderColor: 'rgba(0, 150, 255, 0.3)',
+                    backgroundColor: 'rgba(15, 15, 35, 0.95)',
+                    backdropFilter: 'blur(10px)',
+                    titleColor: '#fff',
+                    bodyColor: 'rgba(255, 255, 255, 0.9)',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
                     borderWidth: 1,
-                    padding: 12,
+                    padding: 14,
+                    cornerRadius: 12,
                     callbacks: {
                         label: function(context) {
                             const label = context.label || '';
@@ -457,6 +499,11 @@ function createSkillChart() {
     const ctx = document.getElementById('skillChart').getContext('2d');
     const { skillData } = window.EVALUATION_DATA;
 
+    // 创建渐变色
+    const gradient = ctx.createLinearGradient(0, 0, 0, 350);
+    gradient.addColorStop(0, 'rgba(102, 126, 234, 0.9)');
+    gradient.addColorStop(1, 'rgba(67, 233, 123, 0.7)');
+
     charts.skill = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -464,10 +511,10 @@ function createSkillChart() {
             datasets: [{
                 label: '平均掌握度',
                 data: skillData.average,
-                backgroundColor: 'rgba(0, 212, 255, 0.6)',
-                borderColor: 'rgba(0, 212, 255, 1)',
+                backgroundColor: gradient,
+                borderColor: '#667EEA',
                 borderWidth: 2,
-                borderRadius: 8,
+                borderRadius: 10,
                 barPercentage: 0.6
             }]
         },
@@ -477,12 +524,14 @@ function createSkillChart() {
             plugins: {
                 legend: { display: false },
                 tooltip: {
-                    backgroundColor: 'rgba(0, 20, 40, 0.9)',
-                    titleColor: '#00d4ff',
-                    bodyColor: '#e0f0ff',
-                    borderColor: 'rgba(0, 150, 255, 0.3)',
+                    backgroundColor: 'rgba(15, 15, 35, 0.95)',
+                    backdropFilter: 'blur(10px)',
+                    titleColor: '#fff',
+                    bodyColor: 'rgba(255, 255, 255, 0.9)',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
                     borderWidth: 1,
-                    padding: 12,
+                    padding: 14,
+                    cornerRadius: 12,
                     callbacks: {
                         label: function(context) {
                             const score = context.parsed.y;
@@ -499,12 +548,16 @@ function createSkillChart() {
                 y: {
                     min: 50,
                     max: 100,
-                    grid: { color: 'rgba(0, 150, 255, 0.1)' },
-                    ticks: { callback: value => value + '分' }
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                    ticks: {
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        callback: value => value + '分'
+                    }
                 },
                 x: {
                     grid: { display: false },
                     ticks: {
+                        color: 'rgba(255, 255, 255, 0.7)',
                         maxRotation: 45,
                         minRotation: 45
                     }
@@ -523,7 +576,7 @@ function createSkillChart() {
  */
 function createQualityRadarChart() {
     const ctx = document.getElementById('qualityRadarChart').getContext('2d');
-    const { qualityDimensions, colors } = window.EVALUATION_DATA;
+    const { qualityDimensions } = window.EVALUATION_DATA;
 
     charts.qualityRadar = new Chart(ctx, {
         type: 'radar',
@@ -533,19 +586,22 @@ function createQualityRadarChart() {
                 {
                     label: '班级平均',
                     data: qualityDimensions.classAverage,
-                    borderColor: colors.group1,
-                    backgroundColor: colors.fill1,
-                    borderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
+                    borderColor: '#667EEA',
+                    backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                    borderWidth: 3,
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: '#667EEA',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
                 },
                 {
                     label: '优秀标准',
                     data: qualityDimensions.excellent,
-                    borderColor: colors.group2,
-                    backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                    borderColor: '#43e97b',
+                    backgroundColor: 'rgba(67, 233, 123, 0.1)',
                     borderWidth: 2,
-                    borderDash: [5, 5],
+                    borderDash: [8, 4],
                     pointRadius: 0,
                     pointHoverRadius: 0
                 }
@@ -560,7 +616,8 @@ function createQualityRadarChart() {
                     labels: {
                         padding: 15,
                         usePointStyle: true,
-                        pointStyle: 'circle'
+                        pointStyle: 'circle',
+                        color: 'rgba(255, 255, 255, 0.7)'
                     }
                 }
             },
@@ -568,15 +625,13 @@ function createQualityRadarChart() {
                 r: {
                     min: 50,
                     max: 100,
-                    grid: {
-                        color: 'rgba(0, 150, 255, 0.2)'
-                    },
-                    angleLines: {
-                        color: 'rgba(0, 150, 255, 0.2)'
-                    },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                    pointLabels: { color: 'rgba(255, 255, 255, 0.7)' },
                     ticks: {
                         stepSize: 25,
-                        showLabelBackdrop: false
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        backdropColor: 'transparent'
                     }
                 }
             },

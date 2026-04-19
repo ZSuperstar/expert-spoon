@@ -5,10 +5,23 @@
 
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', function() {
-    // 延迟显示以确保数据加载
-    setTimeout(() => {
-        initApp();
-    }, 500);
+    // 模拟加载进度
+    let progress = 0;
+    const progressBar = document.querySelector('.loading-progress');
+
+    const progressInterval = setInterval(() => {
+        progress += Math.random() * 20;
+        if (progress >= 100) {
+            progress = 100;
+            clearInterval(progressInterval);
+            setTimeout(() => {
+                initApp();
+            }, 300);
+        }
+        if (progressBar) {
+            progressBar.style.width = progress + '%';
+        }
+    }, 200);
 });
 
 /**
@@ -36,7 +49,9 @@ function initApp() {
     bindEvents();
 
     // 显示提示
-    showToast('数据加载完成');
+    setTimeout(() => {
+        showToast('✨ 数据加载完成');
+    }, 500);
 }
 
 /**
@@ -116,32 +131,45 @@ function renderScoreTable() {
 
     if (!tbody) return;
 
-    tbody.innerHTML = evaluationData.map((data, index) => {
+    // 按总分排序
+    const sortedData = [...evaluationData].sort((a, b) => b.total - a.total);
+
+    tbody.innerHTML = sortedData.map((data, index) => {
         const group = groups.find(g => g.id === data.groupId);
         const grade = getGrade(data.total);
-        const members = group ? group.members.join('、') : '';
+        const members = group ? group.members.join(',') : '';
+        const rankClass = index < 3 ? `rank-${index + 1}` : '';
 
         return `
             <tr data-group-id="${data.groupId}">
+                <td class="rank-cell ${rankClass}">${index + 1}</td>
                 <td><strong>${group ? group.name : '组' + data.groupId}</strong></td>
                 <td class="members-cell" title="${members}">${members}</td>
-                <td class="score-${grade.grade}">${data.pre}</td>
-                <td class="score-${grade.grade}">${data.during}</td>
-                <td class="score-${grade.grade}">${data.post}</td>
-                <td class="score-${grade.grade}">${data.knowledge}</td>
-                <td class="score-${grade.grade}">${data.skill}</td>
-                <td class="score-${grade.grade}">${data.quality}</td>
-                <td class="score-${grade.grade}">${data.certificate}</td>
-                <td><strong class="score-${grade.grade}">${data.total}</strong></td>
-                <td>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${data.total}%"></div>
-                    </div>
-                    <span class="score-${grade.grade}">${grade.text}</span>
-                </td>
+                <td>${data.pre.toFixed(1)}</td>
+                <td>${data.during}</td>
+                <td>${data.post.toFixed(1)}</td>
+                <td>${data.knowledge.toFixed(1)}</td>
+                <td>${data.skill.toFixed(1)}</td>
+                <td>${data.quality.toFixed(1)}</td>
+                <td>${data.certificate.toFixed(1)}</td>
+                <td><strong style="color: ${getColorForGrade(grade.grade)}">${data.total}</strong></td>
+                <td><span class="grade-badge grade-${grade.grade}">${grade.text}</span></td>
             </tr>
         `;
     }).join('');
+}
+
+/**
+ * 根据等级获取颜色
+ */
+function getColorForGrade(grade) {
+    const colors = {
+        excellent: '#43e97b',
+        good: '#4facfe',
+        average: '#fa709a',
+        poor: '#f5576c'
+    };
+    return colors[grade] || '#fff';
 }
 
 /**
@@ -155,8 +183,15 @@ function renderMemberGrid() {
 
     grid.innerHTML = groups.map(group => `
         <div class="member-card">
-            <h4>🔹 ${group.name}</h4>
-            <div class="member-list">${group.members.join('、')}</div>
+            <h4>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                ${group.name}
+            </h4>
+            <div class="member-list">
+                ${group.members.map(member => `<span class="member-tag">${member}</span>`).join('')}
+            </div>
         </div>
     `).join('');
 }
@@ -191,7 +226,7 @@ function bindEvents() {
  * 刷新数据
  */
 function handleRefresh() {
-    showToast('正在刷新数据...');
+    showToast('🔄 正在刷新数据...');
 
     // 模拟数据刷新
     setTimeout(() => {
@@ -205,9 +240,10 @@ function handleRefresh() {
 
             window.ChartManager.update(newData);
             renderStats();
+            renderScoreTable();
         }
 
-        showToast('数据已更新');
+        showToast('✨ 数据已更新');
     }, 800);
 }
 
@@ -215,37 +251,49 @@ function handleRefresh() {
  * 导出报告
  */
 function handleExport() {
-    showToast('正在生成报告...');
+    showToast('📊 正在生成报告...');
 
     // 创建导出内容
     const { evaluationData, groups, calculateStats } = window.EVALUATION_DATA;
     const stats = calculateStats();
 
     const reportContent = `
-分拣机器人智能评价系统 - 评价报告
+╔══════════════════════════════════════════════════════════╗
+║     分拣机器人智能评价系统 - 评价报告                      ║
+╚══════════════════════════════════════════════════════════╝
+
 生成时间：${new Date().toLocaleString('zh-CN')}
 
-===== 统计概览 =====
-班级总人数：${stats.totalStudents}人
-小组数量：${stats.groupCount}组
-班级平均分：${stats.avgScore}分
-优秀率：${stats.excellentRate}%
-达标率：${stats.passRate}%
+═══════════════════════════════════════════════════════════
+  统计概览
+═══════════════════════════════════════════════════════════
 
-===== 各组成绩 =====
+  班级总人数：${stats.totalStudents}人
+  小组数量：${stats.groupCount}组
+  班级平均分：${stats.avgScore}分
+  优秀率：${stats.excellentRate}%
+  达标率：${stats.passRate}%
+
+═══════════════════════════════════════════════════════════
+  各组成绩
+═══════════════════════════════════════════════════════════
 ${evaluationData.map(g => `
-组${g.groupId}: ${g.total}分 (${g.total >= 90 ? '优秀' : g.total >= 80 ? '良好' : g.total >= 70 ? '达标' : '待提高'})
-  - 课前：${g.pre}分
-  - 课中：${g.during}分
-  - 课后：${g.post}分
-  - 知识考核：${g.knowledge}分
-  - 技能考核：${g.skill}分
-  - 素养考核：${g.quality}分
-  - 证书/大赛：${g.certificate}分
+  【组${g.groupId}】${g.total}分 ${getGradeText(g.total)}
+  ────────────────────────────────────────────
+    课前预习：${g.pre}分
+    课中实践：${g.during}分
+    课后巩固：${g.post}分
+    知识考核：${g.knowledge}分
+    技能考核：${g.skill}分
+    素养考核：${g.quality}分
+    证书/大赛：${g.certificate}分
 `).join('')}
+═══════════════════════════════════════════════════════════
+  小组成员
+═══════════════════════════════════════════════════════════
+${groups.map(g => `  ${g.name}: ${g.members.join(' · ')}`).join('\n')}
 
-===== 小组成员 =====
-${groups.map(g => `${g.name}: ${g.members.join('、')}`).join('\n')}
+═══════════════════════════════════════════════════════════
 `;
 
     // 下载文件
@@ -259,7 +307,17 @@ ${groups.map(g => `${g.name}: ${g.members.join('、')}`).join('\n')}
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    showToast('报告已导出');
+    showToast('✅ 报告已导出');
+}
+
+/**
+ * 获取等级文本
+ */
+function getGradeText(score) {
+    if (score >= 90) return '优秀';
+    if (score >= 80) return '良好';
+    if (score >= 70) return '达标';
+    return '待提高';
 }
 
 /**
@@ -282,59 +340,41 @@ function handleFullscreen() {
  * 表格排序
  */
 function handleSortTable(type) {
-    const { evaluationData, getGrade } = window.EVALUATION_DATA;
     const tbody = document.getElementById('scoreTableBody');
 
     if (!tbody) return;
 
-    let sortedData = [...evaluationData];
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    const { evaluationData, getGrade } = window.EVALUATION_DATA;
 
     if (type === 'score') {
         // 按总分排序
-        sortedData.sort((a, b) => b.total - a.total);
+        rows.sort((a, b) => {
+            const scoreA = parseFloat(a.querySelectorAll('td')[9].textContent);
+            const scoreB = parseFloat(b.querySelectorAll('td')[9].textContent);
+            return scoreB - scoreA;
+        });
     } else if (type === 'group') {
         // 按组别排序
-        sortedData.sort((a, b) => a.groupId - b.groupId);
+        rows.sort((a, b) => {
+            const idA = parseInt(a.dataset.groupId);
+            const idB = parseInt(b.dataset.groupId);
+            return idA - idB;
+        });
     }
 
-    // 重新渲染表格
-    sortedData.forEach((data, index) => {
-        const row = tbody.children[index];
-        if (row) {
-            const group = window.EVALUATION_DATA.groups.find(g => g.id === data.groupId);
-            const grade = getGrade(data.total);
-
-            row.querySelector('td:nth-child(3)').textContent = data.pre;
-            row.querySelector('td:nth-child(4)').textContent = data.during;
-            row.querySelector('td:nth-child(5)').textContent = data.post;
-            row.querySelector('td:nth-child(6)').textContent = data.knowledge;
-            row.querySelector('td:nth-child(7)').textContent = data.skill;
-            row.querySelector('td:nth-child(8)').textContent = data.quality;
-            row.querySelector('td:nth-child(9)').textContent = data.certificate;
-            row.querySelector('td:nth-child(10) strong').textContent = data.total;
-
-            // 更新颜色类
-            const cells = row.querySelectorAll('.score-' + grade.grade);
-            cells.forEach(cell => {
-                cell.className = `score-${grade.grade}`;
-            });
-
-            // 更新进度条
-            const progressFill = row.querySelector('.progress-fill');
-            if (progressFill) {
-                progressFill.style.width = data.total + '%';
-            }
-
-            // 更新等级文本
-            const gradeText = row.querySelector('td:last-child span');
-            if (gradeText) {
-                gradeText.textContent = grade.text;
-                gradeText.className = `score-${grade.grade}`;
-            }
+    // 重新添加排序后的行
+    rows.forEach((row, index) => {
+        tbody.appendChild(row);
+        // 更新排名
+        const rankCell = row.querySelector('.rank-cell');
+        if (rankCell) {
+            rankCell.textContent = index + 1;
+            rankCell.className = 'rank-cell' + (index < 3 ? ` rank-${index + 1}` : '');
         }
     });
 
-    showToast(type === 'score' ? '已按分数排序' : '已按组别排序');
+    showToast(type === 'score' ? '📊 已按分数排序' : '📋 已按组别排序');
 }
 
 /**
@@ -349,7 +389,7 @@ function showToast(message) {
 
     setTimeout(() => {
         toast.classList.remove('show');
-    }, 2000);
+    }, 2500);
 }
 
 // 监听全屏变化
@@ -359,18 +399,11 @@ document.addEventListener('fullscreenchange', () => {
         btn.innerHTML = document.fullscreenElement
             ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                  <path d="M8 3v3a2 2 0 01-2 2H3m18 0h-3a2 2 0 01-2-2V3m0 18v-3a2 2 0 012-2h3M3 16h3a2 2 0 012 2v3"/>
-               </svg>`
+               </svg>
+               <span>退出全屏</span>`
             : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                  <path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/>
-               </svg>`;
-    }
-});
-
-// 页面可见性变化时暂停/恢复动画
-document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-        // 页面隐藏时可以考虑暂停动画
-    } else {
-        // 页面显示时恢复
+               </svg>
+               <span>全屏</span>`;
     }
 });
