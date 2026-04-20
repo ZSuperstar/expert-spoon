@@ -3,13 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="分拣机器人操作与编程智能评价系统">
-    <meta name="keywords" content="机器人，评价系统，分拣，职业教育">
     <title>分拣机器人智能评价系统</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- 动态背景 -->
@@ -17,397 +12,145 @@
         <div class="gradient-orb orb-1"></div>
         <div class="gradient-orb orb-2"></div>
         <div class="gradient-orb orb-3"></div>
-        <div class="gradient-orb orb-4"></div>
     </div>
 
-    <div class="container">
+    <div class="wrapper">
         <!-- 导航栏 -->
-        <nav class="navbar glass">
-            <div class="nav-brand">
-                <div class="brand-logo">
-                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="40" height="40" rx="10" fill="url(#brandGradient)"/>
-                        <path d="M20 8L23.5 15H31L25 20L27.5 27L20 22L12.5 27L15 20L9 15H16.5L20 8Z" fill="white"/>
-                        <defs>
-                            <linearGradient id="brandGradient" x1="0" y1="0" x2="40" y2="40">
-                                <stop stop-color="#667EEA"/>
-                                <stop offset="1" stop-color="#764BA2"/>
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                </div>
-                <div class="brand-text">
-                    <h1>智能评价系统</h1>
-                    <p>Robotic Sorting AI Evaluation</p>
+        <nav class="navbar">
+            <div class="logo">
+                <span class="logo-icon">🤖</span>
+                <div>
+                    <h1>分拣机器人智能评价系统</h1>
+                    <p>智能评价 · 数据分析 · 学习追踪</p>
                 </div>
             </div>
             <div class="nav-actions">
-                <button class="nav-btn" id="refreshBtn" title="刷新数据">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M23 4v6h-6M1 20v-6h6"/>
-                        <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
-                    </svg>
-                    <span>刷新</span>
-                </button>
-                <button class="nav-btn primary" id="exportBtn" title="导出报告">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
-                    </svg>
-                    <span>导出</span>
-                </button>
-                <button class="nav-btn" id="fullscreenBtn" title="全屏显示">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/>
-                    </svg>
-                </button>
+                <button class="btn btn-primary" onclick="showToast('📊 正在生成报告...')">📥 导出报告</button>
+                <button class="btn" onclick="showToast('🔄 数据已刷新')">🔄 刷新</button>
             </div>
         </nav>
 
-        <!-- 统计卡片 -->
-        <div class="stats-grid">
-            <div class="stat-card glass" data-aos="fade-up" data-aos-delay="0">
-                <div class="stat-glow"></div>
-                <div class="stat-header">
-                    <div class="stat-icon-wrapper gradient-blue">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-                            <circle cx="9" cy="7" r="4"/>
-                        </svg>
-                    </div>
-                    <span class="stat-badge">总人数</span>
-                </div>
-                <div class="stat-value" id="totalStudents">30</div>
-                <div class="stat-label">6 个学习小组</div>
-                <div class="stat-trend positive">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M18 15l-6-6-6 6"/>
-                    </svg>
-                    <span>全员参与</span>
+        <!-- 统计概览 -->
+        <section class="stats-section">
+            <div class="stat-card stat-1">
+                <div class="stat-icon">👥</div>
+                <div class="stat-info">
+                    <span class="stat-label">学生总数</span>
+                    <span class="stat-value" id="totalStudents">0</span>
+                    <span class="stat-desc">6 个学习小组</span>
                 </div>
             </div>
-
-            <div class="stat-card glass" data-aos="fade-up" data-aos-delay="100">
-                <div class="stat-glow"></div>
-                <div class="stat-header">
-                    <div class="stat-icon-wrapper gradient-green">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                            <path d="M12 2v20M2 12h20"/>
-                        </svg>
-                    </div>
-                    <span class="stat-badge">平均分</span>
-                </div>
-                <div class="stat-value" id="avgScore">82.5</div>
-                <div class="stat-label" id="avgLevel">良好水平</div>
-                <div class="stat-trend positive">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                    </svg>
-                    <span>+5.2% 较上周</span>
+            <div class="stat-card stat-2">
+                <div class="stat-icon">📈</div>
+                <div class="stat-info">
+                    <span class="stat-label">班级平均分</span>
+                    <span class="stat-value" id="avgScore">0</span>
+                    <span class="stat-desc" id="avgLevel">良好</span>
                 </div>
             </div>
-
-            <div class="stat-card glass" data-aos="fade-up" data-aos-delay="200">
-                <div class="stat-glow"></div>
-                <div class="stat-header">
-                    <div class="stat-icon-wrapper gradient-orange">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                        </svg>
-                    </div>
-                    <span class="stat-badge">优秀率</span>
-                </div>
-                <div class="stat-value" id="excellentRate">45%</div>
-                <div class="stat-label">>90 分占比</div>
-                <div class="stat-trend positive">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                    </svg>
-                    <span>+12% 增长率</span>
+            <div class="stat-card stat-3">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-info">
+                    <span class="stat-label">优秀率</span>
+                    <span class="stat-value" id="excellentRate">0%</span>
+                    <span class="stat-desc">≥90 分</span>
                 </div>
             </div>
-
-            <div class="stat-card glass" data-aos="fade-up" data-aos-delay="300">
-                <div class="stat-glow"></div>
-                <div class="stat-header">
-                    <div class="stat-icon-wrapper gradient-purple">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
-                    <span class="stat-badge">达标率</span>
-                </div>
-                <div class="stat-value" id="passRate">92%</div>
-                <div class="stat-label">>70 分占比</div>
-                <div class="stat-trend positive">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                    </svg>
-                    <span>历史新高</span>
+            <div class="stat-card stat-4">
+                <div class="stat-icon">✅</div>
+                <div class="stat-info">
+                    <span class="stat-label">达标率</span>
+                    <span class="stat-value" id="passRate">0%</span>
+                    <span class="stat-desc">≥70 分</span>
                 </div>
             </div>
-        </div>
+        </section>
 
         <!-- 图表区域 -->
-        <div class="dashboard-grid">
-            <!-- 主图表 - 各组综合得分对比 -->
-            <div class="chart-card glass main-chart">
-                <div class="chart-header">
-                    <div class="chart-title">
-                        <div class="title-icon gradient-blue">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                <path d="M18 20V10M12 20V4M6 20v-6"/>
-                            </svg>
-                        </div>
-                        <h3>各组综合得分对比</h3>
+        <section class="charts-section">
+            <div class="chart-row">
+                <div class="chart-card main">
+                    <h3>📊 各组综合得分对比</h3>
+                    <div class="chart-container" style="height: 300px;">
+                        <canvas id="groupBarChart"></canvas>
                     </div>
-                    <div class="chart-actions">
-                        <span class="live-badge">
-                            <span class="live-dot"></span>
-                            实时更新
-                        </span>
-                    </div>
-                </div>
-                <div class="chart-container">
-                    <canvas id="groupBarChart"></canvas>
                 </div>
             </div>
-
-            <!-- 能力维度雷达图 -->
-            <div class="chart-card glass">
-                <div class="chart-header">
-                    <div class="chart-title">
-                        <div class="title-icon gradient-purple">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                        </div>
-                        <h3>能力维度分析</h3>
+            <div class="chart-row">
+                <div class="chart-card">
+                    <h3>📈 6 周成绩趋势</h3>
+                    <div class="chart-container" style="height: 250px;">
+                        <canvas id="trendChart"></canvas>
                     </div>
                 </div>
-                <div class="chart-container">
-                    <canvas id="radarChart"></canvas>
-                </div>
-            </div>
-
-            <!-- 评价构成环形图 -->
-            <div class="chart-card glass">
-                <div class="chart-header">
-                    <div class="chart-title">
-                        <div class="title-icon gradient-green">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <path d="M12 2a10 10 0 0110 10"/>
-                            </svg>
-                        </div>
-                        <h3>评价构成比例</h3>
+                <div class="chart-card">
+                    <h3>🎯 能力维度分析</h3>
+                    <div class="chart-container" style="height: 250px;">
+                        <canvas id="radarChart"></canvas>
                     </div>
                 </div>
-                <div class="chart-container">
-                    <canvas id="doughnutChart"></canvas>
-                </div>
             </div>
-
-            <!-- 过程评价明细 -->
-            <div class="chart-card glass wide-chart">
-                <div class="chart-header">
-                    <div class="chart-title">
-                        <div class="title-icon gradient-orange">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                            </svg>
-                        </div>
-                        <h3>过程评价明细（60%）</h3>
+            <div class="chart-row">
+                <div class="chart-card wide">
+                    <h3>📋 过程评价明细</h3>
+                    <div class="chart-container" style="height: 300px;">
+                        <canvas id="processChart"></canvas>
                     </div>
                 </div>
-                <div class="chart-container tall">
-                    <canvas id="processBarChart"></canvas>
-                </div>
-            </div>
-
-            <!-- 成绩变化趋势 -->
-            <div class="chart-card glass wide-chart">
-                <div class="chart-header">
-                    <div class="chart-title">
-                        <div class="title-icon gradient-cyan">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                <path d="M3 3v18h18M18 9l-5 5-4-4-6 6"/>
-                            </svg>
-                        </div>
-                        <h3>各组成绩变化趋势</h3>
-                    </div>
-                    <span class="period-badge">6 周追踪</span>
-                </div>
-                <div class="chart-container tall">
-                    <canvas id="trendLineChart"></canvas>
-                </div>
-            </div>
-
-            <!-- 评价主体权重 -->
-            <div class="chart-card glass">
-                <div class="chart-header">
-                    <div class="chart-title">
-                        <div class="title-icon gradient-pink">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-                            </svg>
-                        </div>
-                        <h3>评价主体权重</h3>
+                <div class="chart-card">
+                    <h3>🏅 技能点掌握</h3>
+                    <div class="chart-container" style="height: 300px;">
+                        <canvas id="skillChart"></canvas>
                     </div>
                 </div>
-                <div class="chart-container">
-                    <canvas id="evaluatorChart"></canvas>
-                </div>
             </div>
-
-            <!-- 技能点掌握 -->
-            <div class="chart-card glass">
-                <div class="chart-header">
-                    <div class="chart-title">
-                        <div class="title-icon gradient-yellow">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-                            </svg>
-                        </div>
-                        <h3>技能点掌握情况</h3>
-                    </div>
-                </div>
-                <div class="chart-container">
-                    <canvas id="skillChart"></canvas>
-                </div>
-            </div>
-
-            <!-- 职业素养评价 -->
-            <div class="chart-card glass">
-                <div class="chart-header">
-                    <div class="chart-title">
-                        <div class="title-icon gradient-teal">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                            </svg>
-                        </div>
-                        <h3>职业素养评价</h3>
-                    </div>
-                </div>
-                <div class="chart-container">
-                    <canvas id="qualityRadarChart"></canvas>
-                </div>
-            </div>
-        </div>
+        </section>
 
         <!-- 数据表格 -->
-        <div class="data-section glass">
-            <div class="section-header">
-                <div class="section-title">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                    </svg>
-                    <h3>各组详细评价数据</h3>
-                </div>
-                <div class="section-actions">
-                    <button class="action-btn" onclick="sortTable('score')">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M3 4h13M3 8h9M3 12h5M16 16l3-3-3-3M9 20H5a2 2 0 01-2-2V6"/>
-                        </svg>
-                        按分数
-                    </button>
-                    <button class="action-btn" onclick="sortTable('group')">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M3 5h18M3 12h12M3 19h6"/>
-                        </svg>
-                        按组别
-                    </button>
-                </div>
-            </div>
+        <section class="table-section">
+            <h3>📋 各组详细成绩</h3>
             <div class="table-wrapper">
-                <table id="scoreTable">
+                <table>
                     <thead>
                         <tr>
-                            <th>排名</th>
-                            <th>组别</th>
-                            <th>成员</th>
-                            <th>课前 (10%)</th>
-                            <th>课中 (40%)</th>
-                            <th>课后 (10%)</th>
-                            <th>知识 (10%)</th>
-                            <th>技能 (10%)</th>
-                            <th>素养 (10%)</th>
-                            <th>证书 (10%)</th>
-                            <th>总分</th>
-                            <th>等级</th>
+                            <th style="min-width: 50px;">排名</th>
+                            <th style="min-width: 80px;">组别</th>
+                            <th style="min-width: 60px;">课前</th>
+                            <th style="min-width: 60px;">课中</th>
+                            <th style="min-width: 60px;">课后</th>
+                            <th style="min-width: 60px;">知识</th>
+                            <th style="min-width: 60px;">技能</th>
+                            <th style="min-width: 60px;">素养</th>
+                            <th style="min-width: 60px;">证书</th>
+                            <th style="min-width: 70px;">总分</th>
+                            <th style="min-width: 80px;">等级</th>
                         </tr>
                     </thead>
-                    <tbody id="scoreTableBody"></tbody>
+                    <tbody id="scoreTable"></tbody>
                 </table>
             </div>
-        </div>
+        </section>
 
         <!-- 小组成员 -->
-        <div class="data-section glass">
-            <div class="section-header">
-                <div class="section-title">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-                        <circle cx="9" cy="7" r="4"/>
-                        <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
-                    </svg>
-                    <h3>小组成员名单</h3>
-                </div>
-            </div>
-            <div class="members-grid" id="memberGrid"></div>
-        </div>
+        <section class="members-section">
+            <h3>👥 小组成员名单</h3>
+            <div class="members-grid" id="membersGrid"></div>
+        </section>
 
         <!-- 页脚 -->
-        <footer class="glass">
-            <div class="footer-content">
-                <div class="footer-logo">
-                    <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
-                        <rect width="40" height="40" rx="10" fill="url(#footerGradient)"/>
-                        <path d="M20 8L23.5 15H31L25 20L27.5 27L20 22L12.5 27L15 20L9 15H16.5L20 8Z" fill="white"/>
-                        <defs>
-                            <linearGradient id="footerGradient" x1="0" y1="0" x2="40" y2="40">
-                                <stop stop-color="#667EEA"/>
-                                <stop offset="1" stop-color="#764BA2"/>
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                </div>
-                <p class="footer-text">分拣机器人操作与编程智能评价系统 © 2024</p>
-                <p class="footer-sub">技术支持：学习通虚拟仿真软件 | 工业机器人系统操作员 1+X 技能点</p>
-                <div class="footer-links">
-                    <a href="#" class="footer-link">使用帮助</a>
-                    <a href="#" class="footer-link">隐私政策</a>
-                    <a href="#" class="footer-link">联系我们</a>
-                </div>
-            </div>
+        <footer>
+            <p>分拣机器人操作与编程智能评价系统 © 2024</p>
+            <p>职业教育实训平台 | 工业机器人系统操作员 1+X 技能点</p>
         </footer>
     </div>
 
     <!-- 加载动画 -->
     <div class="loading" id="loading">
-        <div class="loading-content">
-            <div class="loading-logo">
-                <div class="logo-ring"></div>
-                <div class="logo-ring delay-1"></div>
-                <div class="logo-ring delay-2"></div>
-                <svg class="logo-icon" viewBox="0 0 40 40">
-                    <rect width="40" height="40" rx="10" fill="url(#loadingGradient)"/>
-                    <path d="M20 8L23.5 15H31L25 20L27.5 27L20 22L12.5 27L15 20L9 15H16.5L20 8Z" fill="white"/>
-                    <defs>
-                        <linearGradient id="loadingGradient" x1="0" y1="0" x2="40" y2="40">
-                            <stop stop-color="#667EEA"/>
-                            <stop offset="1" stop-color="#764BA2"/>
-                        </linearGradient>
-                    </defs>
-                </svg>
-            </div>
-            <p class="loading-text">正在加载数据...</p>
-            <div class="loading-bar">
-                <div class="loading-progress"></div>
-            </div>
-        </div>
+        <div class="spinner"></div>
+        <p>正在加载数据...</p>
     </div>
 
-    <!-- Toast 提示 -->
+    <!-- Toast -->
     <div class="toast" id="toast"></div>
 
     <script src="js/data.js"></script>

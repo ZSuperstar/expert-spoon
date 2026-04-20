@@ -1,34 +1,101 @@
-# Vercel 部署指南
+# 🌐 外网访问 - 永久部署方案
 
-## 一键部署步骤
+## ✅ 方案一：Vercel 部署（强烈推荐）
 
-### 1. 推送到 GitHub
+### 优势
+- ✅ 永久免费
+- ✅ 自动 HTTPS
+- ✅ 支持自定义域名
+- ✅ 全球 CDN 加速
+- ✅ 微信/QQ 可直接访问
+- ✅ 自动 Git 部署
+
+### 部署步骤
+
+1. **访问 Vercel**
+   - 打开 https://vercel.com
+   - 使用 GitHub 账号登录
+
+2. **导入项目**
+   - 点击 "Add New Project"
+   - 选择 "Import Git Repository"
+   - 选择 `expert-spoon` 仓库
+
+3. **部署**
+   - 点击 "Deploy"
+   - 等待部署完成（约 30 秒）
+
+4. **获得永久链接**
+   - 格式：`https://expert-spoon-xxx.vercel.app`
+   - 永久有效，可自定义域名
+
+### 运行 npm 命令
 ```bash
-git add .
-git commit -m "Initial commit"
-git push origin main
+npm run deploy
 ```
 
-### 2. 在 Vercel 导入项目
-1. 访问 [vercel.com](https://vercel.com)
-2. 点击 "Add New Project"
-3. 选择 "Import Git Repository"
-4. 选择这个项目
-5. 点击 "Deploy"
+---
 
-### 3. 配置 GitHub Actions（可选）
-如需自动部署，需在 Vercel 获取 Token：
-1. 访问 [vercel.com/account/tokens](https://vercel.com/account/tokens)
-2. 创建一个新的 Token
-3. 在 GitHub 仓库的 Settings → Secrets and variables → Actions 中添加 `VERCEL_TOKEN`
+## ✅ 方案二：Cloudflare Tunnel（需要域名）
 
-## 为什么之前显示 404？
-- 静态文件在 `deploy/` 子目录，Vercel 默认从根目录提供文件
-- 已将文件移动到根目录，现在可以直接访问
+### 优势
+- ✅ 免费
+- ✅ 可自定义域名
+- ✅ 稳定可靠
 
-## 本地开发
+### 部署步骤
+
+1. **注册 Cloudflare**
+   - 访问 https://cloudflare.com
+   - 注册账号并添加域名
+
+2. **创建 Tunnel**
+   ```bash
+   npx cloudflared tunnel login
+   npx cloudflared tunnel create my-tunnel
+   npx cloudflared tunnel route dns my-tunnel your-domain.com
+   ```
+
+3. **启动服务**
+   ```bash
+   npx cloudflared tunnel run my-tunnel
+   ```
+
+---
+
+## ✅ 方案三：本地穿透（临时使用）
+
+| 工具 | 有效期 | 稳定性 | 适用场景 |
+|------|--------|--------|----------|
+| Cloudflare Quick Tunnel | 2-3 小时 | ⭐⭐⭐⭐ | 临时演示 |
+| Localtunnel | 不固定 | ⭐⭐⭐ | 临时测试 |
+| Ngrok | 随机/固定 | ⭐⭐⭐⭐ | 开发测试 |
+
+### 启动命令
+
 ```bash
-npm install
-npm run dev
-# 访问 http://localhost:8080
+# Cloudflare（2-3 小时）
+npx cloudflared tunnel --url http://localhost:3000
+
+# Localtunnel（随机）
+npx localtunnel --port 3000
+
+# Ngrok（需要账号）
+ngrok http 3000
 ```
+
+---
+
+## 📱 微信/QQ 访问说明
+
+1. 发送 HTTPS 链接到微信/QQ
+2. 首次访问可能有安全提示，点击"继续访问"
+3. 页面正常显示后即可使用
+
+---
+
+## 🚀 推荐方案
+
+**永久使用 → Vercel 部署**
+
+运行 `deploy-vercel.bat` 即可开始部署！

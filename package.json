@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "description": "分拣机器人操作与编程智能评价系统",
   "scripts": {
-    "dev": "npx http-server -p 8080 -c-1 --open",
-    "start": "npx http-server -p 8080"
+    "dev": "npx http-server -p 3000 -a 0.0.0.0 -c-1",
+    "start": "npx http-server -p 3000 -a 0.0.0.0 -c-1",
+    "tunnel": "npx cloudflared tunnel --url http://localhost:3000",
+    "deploy": "vercel --prod"
   },
   "keywords": [
     "robot",

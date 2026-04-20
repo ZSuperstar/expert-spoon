@@ -1,4 +1,5 @@
 {
+  "name": "teachsee-robot-evaluation",
   "buildCommand": "echo 'Static site'",
   "outputDirectory": ".",
   "installCommand": "echo 'No install'"
